@@ -1,0 +1,20 @@
+.conversations-panel {
+    .MuiListItemButton-root {
+      transition: all 0.2s ease-in-out;
+      
+      &:hover {
+        transform: translateX(2px);
+      }
+      
+      &.Mui-selected {
+        box-shadow: 0 2px 8px rgba(234, 30, 33, 0.15);
+      }
+    }
+    
+    .MuiListItemText-secondary {
+      .MuiBox-root {
+        display: flex;
+        flex-direction: column;
+      }
+    }
+  }
