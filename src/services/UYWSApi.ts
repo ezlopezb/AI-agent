@@ -1,11 +1,17 @@
 import axios from "axios";
+import { HotelOption } from "../components/HotelsBubble";
 
 const api = axios.create({ baseURL: import.meta.env.VITE_API_URL });
 
 export interface AgentResponse {
   role: string;
   content: string;
-  data?: PnrCreateInfo | FlightInfo[] | CarOption[];
+  data?: {
+    pnr: PnrCreateInfo | null;
+    flights: FlightInfo[] | null;
+    cars: CarOption[];
+    hotels: HotelOption[] | null;
+  };
 }
 
 export interface PnrCreateInfo {
@@ -54,7 +60,7 @@ export interface CarOption {
 }
 
 export interface ChatMessage {
-  role: 'assistant' | 'user';
+  role: 'assistant' | 'user' | 'system' | 'tool';
   sessionId: string;
   message: string;
   timestamp: Date;
@@ -69,7 +75,7 @@ export interface Conversation {
 
 export const getConversations = async (): Promise<Conversation[]> => {
   try {
-    const response = await api.get("/chat/conversations/sonar");
+    const response = await api.get(`/chat/conversations/${import.meta.env.VITE_USER_NAME}`);
     return response.data;
   } catch (error) {
     throw error;
@@ -79,7 +85,6 @@ export const getConversations = async (): Promise<Conversation[]> => {
 export const getConversationMessages = async (sessionId: string): Promise<ChatMessage[]> => {
   try {
     const response = await api.get(`/chat/conversations/messages/${sessionId}`);
-    console.log(response.data);
     return response.data;
   } catch (error) {
     throw error;

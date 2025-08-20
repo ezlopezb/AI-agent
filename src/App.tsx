@@ -11,6 +11,7 @@ function App() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [currentSessionId, setCurrentSessionId] = useState<string>('');
   const [conversationsLoading, setConversationsLoading] = useState(false);
+  const [currentConversationIndex, setCurrentConversationIndex] = useState<number>(0);
 
   const ChatContainer = styled.div`
     position: fixed;
@@ -33,8 +34,9 @@ function App() {
     }
   };
 
-  const handleConversationSelect = (sessionId: string) => {
+  const handleConversationSelect = (sessionId: string, conversationIndex: number) => {
     setCurrentSessionId(sessionId);
+    setCurrentConversationIndex(conversationIndex);
   };
 
   const handleNewConversation = () => {
@@ -73,7 +75,7 @@ function App() {
           style={{
             display: 'flex',
             alignItems: 'center',
-            backgroundColor: '#ffffff',
+            backgroundColor: '#000000',
             color: '#ffffff',
             padding: '10px',
             position: 'fixed',
@@ -91,19 +93,19 @@ function App() {
           <span style={{ fontWeight: 'bold', color: '#ea1e21', marginRight: '10px' }}>
             UY Web Solutions
           </span>
-          <img
-            src="https://res.cloudinary.com/dhuwsns6p/image/upload/v1741727074/logo_black_8bb3717a47.svg"
-            alt="AI Travel Agent"
+          <h1
             style={{
               margin: 0,
+              fontSize: '1.5rem',
               position: 'absolute',
               top: '50%',
               left: '50%',
               transform: 'translate(-50%, -50%)',
-              maxWidth: '200px',
-              height: 'auto',
+              textAlign: 'center',
             }}
-          />
+          >
+            AI Travel Assistant
+          </h1>
         </Paper>
       </header>
       
@@ -111,6 +113,7 @@ function App() {
         <ChatInterface 
           sessionId={currentSessionId} 
           onMessageSent={handleFirstMessageSent}
+          index={currentConversationIndex}
         />
       </ChatContainer>
       

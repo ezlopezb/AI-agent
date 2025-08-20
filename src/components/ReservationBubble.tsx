@@ -15,7 +15,7 @@ export const ReservationBubble: React.FC<ReservationBubbleProps> = ({ data }) =>
     <div className="data-bubble reservation-data">
       <div className="reservation-container">
         <div className="reservation-header">
-          <h3>Reserva confirmada</h3>
+          <h3>Reservation confirmed</h3>
           <div className="reservation-id">
             ID: {data.reservationId}
           </div>
@@ -23,17 +23,17 @@ export const ReservationBubble: React.FC<ReservationBubbleProps> = ({ data }) =>
 
         <div className="reservation-details">
           <div className="reservation-message">
-            Reserva confirmada con éxito. Una vez realizado el pago, la agencia se encargará del proceso de emisión con el proveedor.
+            Reservation confirmed successfully. The agency will contact the provider to finalize the booking.
           </div>
           
           <div className="reservation-type">
-            <span className="type-label">Tipo:</span>
+            <span className="type-label">Type:</span>
             <span className="type-value">{data.type}</span>
           </div>
 
           <div className="price-section">
             <div className="total-price">
-              <span className="price-label">Precio total:</span>
+              <span className="price-label">Total fare:</span>
               <span className="price-amount">${data.price}</span>
             </div>
           </div>
@@ -44,7 +44,7 @@ export const ReservationBubble: React.FC<ReservationBubbleProps> = ({ data }) =>
             className="payment-button"
             onClick={handlePayment}
           >
-            Pagar
+            Pay
           </button>
         </div>
       </div>

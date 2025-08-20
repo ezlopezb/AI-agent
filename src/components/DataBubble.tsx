@@ -16,8 +16,10 @@ const DataBubble: React.FC<DataBubbleProps> = ({ data }) => {
   }
   
   // Check if data is PnrCreateInfo (assuming it has a specific property like pnr or confirmation)
-  if (data && typeof data === 'object' && (data.pnr)) {
-    return <ReservationBubble data={data.pnr} />;
+  if (data && typeof data === 'object' && (data.pnr || data.reservationId)) {
+    // If data has pnr property, pass data.pnr, otherwise pass data directly
+    const reservationData = data.pnr || data;
+    return <ReservationBubble data={reservationData} />;
   }
 
   if (data && typeof data === 'object' && data.cars) {

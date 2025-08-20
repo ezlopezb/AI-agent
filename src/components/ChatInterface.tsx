@@ -6,22 +6,30 @@ import './ChatInterface.scss';
 import { MessageBubble } from './MessageBubble';
 import DataBubble from './DataBubble';
 import loadingGif from '../assets/loading.gif';
+import { HotelOption } from './HotelsBubble';
 
 interface ChatMessage {
   role: 'assistant' | 'user';
   sessionId: string;
   message: string;
   timestamp: Date;
-  data?: PnrCreateInfo | FlightInfo[] | CarOption[];
+  data?: {
+    pnr: PnrCreateInfo | null;
+    flights: FlightInfo[] | null;
+    cars: CarOption[];
+    hotels: HotelOption[] | null;
+  };
 }
 
 interface ChatInterfaceProps {
   sessionId: string;
+  index: number;
   onMessageSent: () => void;
 }
 
 export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   sessionId,
+  index,
   onMessageSent,
 }) => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -94,10 +102,10 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
     setIsLoading(true);
 
     try {
-      const agentResponse = await aiAgentRetriveMessage(userMessage.sessionId, userMessage.message, "sonar", sessionId);
+      const agentResponse = await aiAgentRetriveMessage(userMessage.sessionId, userMessage.message, import.meta.env.VITE_USER_NAME, `Conversation #${index+1}` );
       setIsLoading(false);
       onMessageSent();
-      if (agentResponse?.content !== "") {
+      if (agentResponse?.content && agentResponse?.content !== "") {
         setMessages(prev => [...prev, {
           role: 'assistant',
           sessionId,
@@ -120,15 +128,25 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
     }
   };
 
+  const renderBubble = (msg: ChatMessage) => {
+    if (msg.data) {
+      return <DataBubble data={msg.data} />;
+    } else if(msg.message && msg.message.charAt(0) === '{') {
+      return <DataBubble data={JSON.parse(msg.message)} />;
+    } else if (msg.message) {
+      return <MessageBubble message={msg.message} />
+    } else {
+      return null
+    }
+  }
+
   return (
     <div className="chat-interface">
       <div className="messages">
         {messages.map((msg, i) => {
           if (msg.role !== 'user' && msg.role !== 'assistant') return null; // Skip non-user/assistant messages
           return <div key={i} className={`message ${msg.role}`}>
-            {msg.message && msg.message.charAt(0) != "{" && <MessageBubble message={msg.message} />}
-            {msg.message && msg.message.charAt(0) == "{" && <DataBubble data={JSON.parse(msg.message)} />}
-            {msg.data && <DataBubble data={msg.data} />}
+            {renderBubble(msg)}
           </div>
         })}
         {isLoading && (
@@ -147,7 +165,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
           value={inputMessage}
           onChange={(e) => setInputMessage(e.target.value)}
           onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-          placeholder="Escribe un mensaje..."
+          placeholder="Type a message..."
           variant="outlined"
           disabled={isLoading}
           InputProps={{

@@ -10,13 +10,12 @@ export const FlightBubble: React.FC<DataBubbleProps> = ({ data }) => {
   // Check if data is FlightInfo array
   if (Array.isArray(data) && data.length > 0 && 'flights' in data[0]) {
     const flightInfoArray = data as FlightInfo[];
-    console.log("Flight Info Array:", flightInfoArray);
     return (
       <div className="data-bubble flight-data">
         {flightInfoArray.map((flightInfo, index) => (
           <div key={index} className="flight-info-container">
             <div className="flight-header">
-              <h3>Opción {index + 1}</h3>
+              <h3>Option {index + 1}</h3>
               <div className="total-fare">
                 {flightInfo.totalFare} {flightInfo.currency}
               </div>
@@ -59,7 +58,7 @@ export const FlightBubble: React.FC<DataBubbleProps> = ({ data }) => {
 
             {flightInfo.passengerCounts.length > 0 && (
               <div className="passenger-info">
-                <strong>Pasajeros: </strong>
+                <strong>Passengers: </strong>
                 {flightInfo.passengerCounts.map((pc, i) => (
                   <span key={i}>{pc.count} {pc.type}{i < flightInfo.passengerCounts.length - 1 ? ', ' : ''}</span>
                 ))}

@@ -23,7 +23,7 @@ import './ConversationsPanel.scss';
 interface ConversationsPanelProps {
   conversations: Conversation[];
   selectedSessionId: string;
-  onConversationSelect: (sessionId: string) => void;
+  onConversationSelect: (sessionId: string, index: number) => void;
   onNewConversation: () => void;
   reloadConversations: () => void; // Callback to refresh conversations list
   loading?: boolean;
@@ -108,12 +108,12 @@ export const ConversationsPanel: React.FC<ConversationsPanelProps> = ({
         zIndex: 999,
         display: 'flex',
         flexDirection: 'column',
-        backgroundColor: '#f5f5f5'
+        backgroundColor: '#191919'
       }}
     >
       <Box sx={{ p: 2, borderBottom: '1px solid #e0e0e0' }}>
-        <Typography variant="h6" sx={{ mb: 2, color: '#333' }}>
-          Cotizaciones
+        <Typography variant="h6" sx={{ mb: 2, color: '#ffffff' }}>
+          Quotes History
         </Typography>
         <Button
           fullWidth
@@ -127,7 +127,7 @@ export const ConversationsPanel: React.FC<ConversationsPanelProps> = ({
             }
           }}
         >
-          Nueva cotización
+          New Quote
         </Button>
       </Box>
       
@@ -144,16 +144,16 @@ export const ConversationsPanel: React.FC<ConversationsPanelProps> = ({
             />
           </ListItem>
         ) : (
-          conversations.map((conversation) => (
+          conversations.map((conversation, index) => (
             <React.Fragment key={conversation.sessionId}>
               <ListItemButton
                 selected={selectedSessionId === conversation.sessionId}
-                onClick={() => onConversationSelect(conversation.sessionId)}
+                onClick={() => onConversationSelect(conversation.sessionId, index)}
                 sx={{
                   py: 2,
                   px: 2,
                   '&.Mui-selected': {
-                    backgroundColor: '#e3f2fd',
+                    backgroundColor: '#2d2d2d',
                     borderRight: '3px solid #ea1e21'
                   },
                   '&:hover': {
@@ -175,6 +175,7 @@ export const ConversationsPanel: React.FC<ConversationsPanelProps> = ({
                           sx={{ 
                             flex: 1,
                             '& .MuiOutlinedInput-root': {
+                              color: "#ffffff",
                               fontSize: '0.875rem'
                             }
                           }}
@@ -206,7 +207,7 @@ export const ConversationsPanel: React.FC<ConversationsPanelProps> = ({
                       </Box>
                     ) : (
                       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <Typography variant="subtitle2" noWrap sx={{ fontWeight: 'medium', flex: 1 }}>
+                        <Typography variant="subtitle2" noWrap sx={{ fontWeight: 'medium', flex: 1, color: '#ffffff' }}>
                           {conversation.title}
                         </Typography>
                         <IconButton
@@ -218,7 +219,8 @@ export const ConversationsPanel: React.FC<ConversationsPanelProps> = ({
                           sx={{ 
                             opacity: 0.6,
                             '&:hover': { opacity: 1 },
-                            ml: 1
+                            ml: 1,
+                            color: '#ea1e21'
                           }}
                         >
                           <EditIcon fontSize="small" />

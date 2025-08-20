@@ -2,7 +2,7 @@ import React from 'react';
 import { PnrCreateInfo, FlightInfo, CarOption } from '../services/UYWSApi';
 import './ChatInterface.scss';
 
-interface HotelOption {
+export interface HotelOption {
   hotelCode: string;
   hotelName: string;
   chainName: string;
@@ -38,9 +38,7 @@ interface DataBubbleProps {
 export const HotelBubble: React.FC<DataBubbleProps> = ({ data }) => {
   // Check if data is HotelOption array
   if (Array.isArray(data) && data.length > 0 && 'hotelCode' in data[0]) {
-    const hotelArray = data as HotelOption[];
-    console.log("Hotel Array:", hotelArray);
-    
+    const hotelArray = data as HotelOption[];    
     return (
       <div className="data-bubble hotel-data">
         {hotelArray.map((hotel, index) => (
