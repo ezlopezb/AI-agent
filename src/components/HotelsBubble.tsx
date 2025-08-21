@@ -1,5 +1,4 @@
 import React from 'react';
-import { PnrCreateInfo, FlightInfo, CarOption } from '../services/UYWSApi';
 import './ChatInterface.scss';
 
 export interface HotelOption {
