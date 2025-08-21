@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import './App.css';
-import { Paper } from '@mui/material';
+import { Button, Paper } from '@mui/material';
 import { toast, ToastContainer } from 'react-toastify';
 import { ChatInterface } from './components/ChatInterface';
 import { ConversationsPanel } from './components/ConversationsPanel';
@@ -42,6 +42,7 @@ function App() {
   const handleNewConversation = () => {
     const newSessionId = Math.random().toString(36);
     setCurrentSessionId(newSessionId);
+    setCurrentConversationIndex(conversations.length);
   };
 
   const handleFirstMessageSent = async () => {
@@ -68,55 +69,63 @@ function App() {
         loading={conversationsLoading}
         reloadConversations={loadConversations}
       />
-      
-      <header style={{ marginLeft: '300px' }}>
+
+      <header style={{ marginLeft: '300px', position: 'relative' }}>
         <Paper
           elevation={3}
           style={{
             display: 'flex',
             alignItems: 'center',
+            justifyContent: 'space-between',
             backgroundColor: '#000000',
             color: '#ffffff',
-            padding: '10px',
+            padding: '10px 20px', // Add padding to the header
             position: 'fixed',
             top: 0,
             left: '300px',
-            width: 'calc(100% - 300px)',
+            width: 'calc(100vw - 300px)', // Ensure the header fits within the viewport
+            boxSizing: 'border-box', // Include padding in width calculation
             zIndex: 1000,
           }}
         >
-          <img
-            src="https://uywebsolutionslanding.s3.us-east-2.amazonaws.com/img/icons/logo.png"
-            alt="Logo"
-            style={{ height: '40px', marginRight: '10px' }}
-          />
-          <span style={{ fontWeight: 'bold', color: '#ea1e21', marginRight: '10px' }}>
-            UY Web Solutions
-          </span>
-          <h1
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <h1
+              style={{
+                margin: 0,
+                fontSize: '1.5rem',
+                textAlign: 'center',
+              }}
+            >
+              AI Travel Assistant
+            </h1>
+          </div>
+          <Button
+            variant="contained"
+            color="secondary"
+            onClick={() => {
+              localStorage.removeItem('authToken'); // Clear the auth token
+              window.location.reload(); // Reload the page to redirect to the login screen
+            }}
             style={{
-              margin: 0,
-              fontSize: '1.5rem',
-              position: 'absolute',
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-              textAlign: 'center',
+              backgroundColor: '#ea1e21',
+              color: '#ffffff',
+              textTransform: 'none',
+              marginRight: '0', // Remove unnecessary margin
             }}
           >
-            AI Travel Assistant
-          </h1>
+            Logout
+          </Button>
         </Paper>
       </header>
-      
+
       <ChatContainer>
-        <ChatInterface 
-          sessionId={currentSessionId} 
+        <ChatInterface
+          sessionId={currentSessionId}
           onMessageSent={handleFirstMessageSent}
           index={currentConversationIndex}
         />
       </ChatContainer>
-      
+
       <ToastContainer />
     </>
   );

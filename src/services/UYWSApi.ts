@@ -1,8 +1,13 @@
 import axios from "axios";
 import { HotelOption } from "../components/HotelsBubble";
+import CryptoJS from "crypto-js";
 
 const api = axios.create({ baseURL: import.meta.env.VITE_API_URL });
 
+export interface LoginResponse {
+  token: string;
+  providers: any[];
+}
 export interface AgentResponse {
   role: string;
   content: string;
@@ -75,7 +80,7 @@ export interface Conversation {
 
 export const getConversations = async (): Promise<Conversation[]> => {
   try {
-    const response = await api.get(`/chat/conversations/${import.meta.env.VITE_USER_NAME}`);
+    const response = await api.get(`/chat/conversations/`, { headers: { 'authorization': `Bearer ${localStorage.getItem("token")}` || '' } });
     return response.data;
   } catch (error) {
     throw error;
@@ -84,23 +89,23 @@ export const getConversations = async (): Promise<Conversation[]> => {
 
 export const getConversationMessages = async (sessionId: string): Promise<ChatMessage[]> => {
   try {
-    const response = await api.get(`/chat/conversations/messages/${sessionId}`);
+    const response = await api.get(`/chat/conversations/messages/${sessionId}`, { headers: { 'authorization': `Bearer ${localStorage.getItem("token")}` || '' } });
     return response.data;
   } catch (error) {
     throw error;
   }
 }
 
-export const aiAgentRetriveMessage = async (sessionId: string, message: string, user: string, conversationTitle?: string): Promise<AgentResponse> => {
+export const aiAgentRetriveMessage = async (sessionId: string, message: string, conversationTitle?: string): Promise<AgentResponse> => {
   try {
     const response = await api.post(
       "/chat",
       {
       sessionId,
       message,
-      title: conversationTitle,
-      user
-      }
+      title: conversationTitle
+      },
+      { headers: { 'authorization': `Bearer ${localStorage.getItem("token")}` || '' } }
     );
     return response?.data;
   } catch (error) {
@@ -110,8 +115,50 @@ export const aiAgentRetriveMessage = async (sessionId: string, message: string, 
 
 export const renameconversation = async (sessionId: string, title: string): Promise<void> => {
   try {
-    await api.post(`/chat/conversations/rename`, { sessionId, title });
+    await api.post(`/chat/conversations/rename`, { sessionId, title }, { headers: { 'authorization': `Bearer ${localStorage.getItem("token")}` || '' } } );
   } catch (error) {
     throw error; 
   }
 }
+
+const encryptPassword = (password: string) => {
+  const encryptionKey = import.meta.env.VITE_ENCRIPTION_KEY;
+
+  // Encrypt the password
+  const encrypted = CryptoJS.AES.encrypt(password, CryptoJS.enc.Utf8.parse(encryptionKey), {
+    iv: CryptoJS.enc.Utf8.parse(encryptionKey),
+    mode: CryptoJS.mode.CBC,
+    padding: CryptoJS.pad.Pkcs7,
+  });
+
+  return encrypted.ciphertext.toString(CryptoJS.enc.Hex)
+};
+
+export const login = async(email: string, password: string): Promise<LoginResponse> => {
+  try {
+    const encryptedPassword = await encryptPassword(password);
+    const response = await api.post("/login", { email, password: encryptedPassword });
+    if(!response.data.token) {
+      throw "Invalid credentials";
+    }
+    localStorage.setItem("token", response.data.token);
+    return response.data; // Return full response instead of just token
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const updateSabreCredentials = async (sabreCreds: { pass: string; epr: string; pcc: string }) => {
+  try {
+    const response = await api.post("/login/update", { sabreCreds }, {
+      headers: { 'authorization': `Bearer ${localStorage.getItem("token")}` || '' }
+    });
+    if(response.status !== 200) {
+      throw new Error("Failed to update Sabre credentials");
+    }
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+

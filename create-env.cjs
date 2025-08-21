@@ -2,7 +2,8 @@
 const fs = require('fs');
 const path = require('path');
 
-const envContent = `VITE_API_URL=https://3fc5-2800-a4-1509-6800-1d2b-401b-a0ca-ceb.ngrok-free.app/api`;
+const envContent = `VITE_API_URL=localhost:4200/api VITE_ENCRIPTION_KEY="12345678901234567890123456789012"
+VITE_IV="f83d0db75dce1bdfaa5da86398fd7bda"`;
 
 const envPath = path.join(__dirname, './.env');
 

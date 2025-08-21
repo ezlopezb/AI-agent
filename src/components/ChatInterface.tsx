@@ -102,7 +102,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
     setIsLoading(true);
 
     try {
-      const agentResponse = await aiAgentRetriveMessage(userMessage.sessionId, userMessage.message, import.meta.env.VITE_USER_NAME, `Conversation #${index+1}` );
+      const agentResponse = await aiAgentRetriveMessage(userMessage.sessionId, userMessage.message, `Conversation #${index+1}` );
       setIsLoading(false);
       onMessageSent();
       if (agentResponse?.content && agentResponse?.content !== "") {
