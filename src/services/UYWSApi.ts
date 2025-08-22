@@ -4,6 +4,39 @@ import CryptoJS from "crypto-js";
 
 const api = axios.create({ baseURL: import.meta.env.VITE_API_URL });
 
+// Add response interceptor to handle 401 errors
+api.interceptors.response.use(
+  (response) => {
+    // Return successful responses as-is
+    return response;
+  },
+  (error) => {
+    // Check if the error is 401 and not from the login endpoint
+    if (error.response?.status === 401) {
+      const requestUrl = error.config?.url;
+      
+      // Don't logout for login endpoint failures
+      if (!requestUrl?.includes('/login')) {
+        // Execute logout logic
+        handleLogout();
+      }
+    }
+    
+    // Re-throw the error so it can still be handled by the calling code
+    return Promise.reject(error);
+  }
+);
+
+// Logout handler function
+const handleLogout = () => {
+  // Clear stored tokens
+  localStorage.removeItem('authToken');
+  localStorage.removeItem('token');
+  
+  // Reload the page to redirect to login screen
+  window.location.reload();
+};
+
 export interface LoginResponse {
   token: string;
   providers: any[];
@@ -137,6 +170,7 @@ const encryptPassword = (password: string) => {
 export const login = async(email: string, password: string): Promise<LoginResponse> => {
   try {
     const encryptedPassword = await encryptPassword(password);
+    console.log(encryptedPassword)
     const response = await api.post("/login", { email, password: encryptedPassword });
     if(!response.data.token) {
       throw "Invalid credentials";

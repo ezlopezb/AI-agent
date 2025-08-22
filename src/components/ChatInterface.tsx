@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import SendIcon from '@mui/icons-material/Send';
 import { IconButton, InputAdornment, TextField } from '@mui/material';
 import { aiAgentRetriveMessage, CarOption, FlightInfo, getConversationMessages, PnrCreateInfo } from '../services/UYWSApi';
@@ -37,10 +37,21 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const currentSessionRef = useRef(sessionId);
 
-  const fetchMessages = async () => {
+  useEffect(() => {
+    currentSessionRef.current = sessionId;
+  }, [sessionId]);
+
+  const fetchMessages = useCallback(async (signal?: AbortSignal) => {
+    const requestSessionId = currentSessionRef.current;
+    if (!requestSessionId) return;
     try {
       const initialMessages = await getConversationMessages(sessionId);
+      
+      // Check if request was cancelled
+      if (signal?.aborted || currentSessionRef.current !== requestSessionId) return;
+      
       if (initialMessages && initialMessages.length > 0) {
         const transformedMessages = initialMessages.map((msg: any) => ({
           role: msg.role,
@@ -51,34 +62,42 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
         }));
         setMessages(transformedMessages);
       } else {
-        // Clear messages if no conversation exists
         setMessages([]);
       }
     } catch (error) {
+      if (signal?.aborted) return; // Don't log errors for cancelled requests
       console.error('Error fetching initial messages:', error);
-      setMessages([]); // Clear messages on error
-    }
-  };
-
-  // Update messages when initialMessages prop changes
-  useEffect(() => {
-    if (sessionId && !isFetching) {
-      setIsFetching(true);
-      fetchMessages().finally(() => setIsFetching(false));
+      setMessages([]);
     }
   }, [sessionId]);
 
-  useEffect(() => {}, [messages]);
+  // Update messages when initialMessages prop changes
+  useEffect(() => {
+    if (!sessionId || isFetching) return;
+    
+    const abortController = new AbortController();
+    setIsFetching(true);
+    
+    fetchMessages(abortController.signal).finally(() => {
+      if (!abortController.signal.aborted) {
+        setIsFetching(false);
+      }
+    });
+    
+    return () => {
+      abortController.abort();
+    };
+  }, [sessionId, fetchMessages]);
 
   useEffect(() => {
     setInputMessage('');
   }, [sessionId]);
 
   const scrollToBottom = () => {
-    // Use setTimeout to debounce the scroll
-    setTimeout(() => {
-      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, 100);
+    const messagesContainer = messagesEndRef.current?.parentElement;
+  if (messagesContainer) {
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+  }
   };
   
   useEffect(() => {

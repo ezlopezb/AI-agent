@@ -25,7 +25,13 @@ function App() {
     try {
       setConversationsLoading(true);
       const conversationsList = await getConversations();
-      setConversations(conversationsList);
+      setConversations(prev => {
+        // Only update if the conversations have actually changed
+        if (JSON.stringify(prev) !== JSON.stringify(conversationsList)) {
+          return conversationsList;
+        }
+        return prev;
+      });
     } catch (error) {
       console.error('Error loading conversations:', error);
       toast.error('Failed to load conversations');

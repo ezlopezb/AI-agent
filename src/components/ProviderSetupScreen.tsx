@@ -107,7 +107,7 @@ export const ProviderSetupScreen: React.FC<ProviderSetupScreenProps> = ({ open, 
               Sabre Configuration
             </Typography>
             <Alert severity="info" sx={{ mb: 3 }}>
-              Please enter your Sabre cert credentials. These are required for accessing Sabre services.
+              Please enter your Sabre <b>CERT</b> credentials. These are required for accessing Sabre services.
             </Alert>
             
             {error && (
